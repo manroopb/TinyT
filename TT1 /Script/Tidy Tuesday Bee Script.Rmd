@@ -1,0 +1,48 @@
+---
+title: 'Tidy Tuesday 1: Bees'
+author: "Manroop"
+date: "3/22/2022"
+output: html_document
+---
+For this Tidy Tuesday I will be plotting the number of bee colonies in 2022 by state. 
+To do this I will first mutate our data to only have the data from the year 2022, I will then plot the US and add in the mutated data to show the number of bee colonies per state. 
+
+# Load Libraries #
+```{r}
+library(tidyverse)
+library(here)
+library(maps)
+library(mapdata)
+library(mapproj)
+library(PNWColors) 
+install.packages("usmap")
+library(usmap)
+library(ggplot2)
+```
+
+
+# Load Data #
+```{r}
+colony <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/colony.csv')
+stressor <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-01-11/stressor.csv') %>% filter(year==2022)
+spec(colony)
+glimpse (colony)
+popdata<-read_csv(here("Tidy Tuesday 1","Data","CApopdata.csv"))
+world<-map_data("world")
+head(world)
+```
+# Plot the US and Bee Colonies #
+```{r}
+plot_usmap(data = colony, values = "colony_n", color = "yellow") + 
+  scale_fill_continuous(
+    low = "white", high = "orange", 
+    name = "Bee Colony Number", 
+    label = scales::comma
+  ) + theme(legend.position = "right")+
+labs( title = "Bee Colonies in the US in 2022")
+ggsave(here("Tidy Tuesday 1","Output","BeeC1.pdf"))
+```
+The above chunk gave us the base work for what we wanted out of our data from this point on alterations done to the graph will be fully for aesthetic purposes. 
+
+
+

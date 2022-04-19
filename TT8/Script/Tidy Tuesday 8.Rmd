@@ -1,0 +1,48 @@
+---
+title: "Tidy Tuesday 8 Baby Names"
+author: "Manroop"
+date: "3/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Load Data #
+
+```{r Load}
+babynames <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-03-22/babynames.csv')%>%
+  mutate(sex = ifelse(sex == "M", "Male", "Female"))
+top_names <- babynames %>%
+  group_by(year, sex) %>%
+  mutate(rank = rank(-n)) %>%
+  filter(rank <= 5) %>%
+  ungroup()
+```
+
+
+# Visualize
+
+```{r Visualize}
+babynames %>%
+  filter(name %in% c("Stephanie", "Angela", "Heather", "Lauren", "Thomas")) %>%
+  count(year, name, wt = n) %>%
+  mutate(name = fct_reorder(name, -n)) %>%
+  ggplot(aes(year, n, fill = name)) +
+  geom_col(show.legend = FALSE, alpha = 0.5) +
+  geom_smooth(aes(color = name), method = "loess", se = FALSE, show.legend = FALSE) +
+  expand_limits(y = 0) +
+  #scale_y_log10() +
+  facet_wrap(~name, scales = "free_y", ncol = 1) +
+  labs(x = "Year",
+       y = "Number of Babies with Name",
+       title = "Most Popular Baby Names")
+ggsave(here("Tidy Tuesday 8", "Output", "BabyN.pdf"))
+```
+
+```{r}
+
+```
+
