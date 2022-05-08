@@ -1,0 +1,56 @@
+---
+title: "Tidy Tuesday 4"
+author: "Manroop"
+date: "3/23/2022"
+output: html_document
+---
+
+#Load Libraries#
+```{r}
+library(tidyverse)
+#install.packages("tvthemes")
+library(tvthemes) 
+library(tidytext) 
+#install.packages("circlize")
+library(circlize) 
+#install.packages("ggnetwork")
+library(ggnetwork)
+install.packages("magick")
+```
+
+#Getting Data#
+```{r}
+avatar <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-08-11/avatar.csv')
+```
+
+#Cleaning Data#
+```{r}
+characterlist <- c('Katara', 'Sokka', 'Zuko', 'Aang', 'Iroh', 'Azula', 'Toph', 'Avatar')
+characterlist2 <- c('katara', 'sokka', 'zuko', 'aang', 'iroh', 'azula', 'toph', 'avatar')
+
+avatar2 <- avatar %>%
+  select(character, character_words) %>%
+  filter(character %in% characterlist) %>%
+  unnest_tokens(word, character_words) %>%
+  filter(word %in% characterlist2) %>%
+  group_by(character, word) %>%
+  tally() %>%
+  pivot_wider(names_from = `word`, values_from = `n`, values_fill = 0) %>%
+  ungroup() %>%
+  add_row(katara = 0, sokka = 0, zuko = 0, aang = 0, iroh = 0,
+          azula = 0, toph = 0, avatar = 0, .before = 2) %>%
+  select(-c(character))
+```
+
+Making Plot
+```{r}
+
+rownames(avatar2) <- c('Aang', 'Avatar', 'Azula', 'Iroh', 'Katara', 'Sokka', 'Toph', 'Zuko')
+colnames(avatar2) <- c('Aang', 'Avatar', 'Azula', 'Iroh', 'Katara', 'Sokka', 'Toph', 'Zuko')
+
+chordDiagram(avatar2, 
+             grid.col = scale_color_viridis_b(), transparency = 0.5,
+             annotationTrack = c('name', 'grid'))
+ggsave(here("Tidy Tuesday 4", "Output", "Avatarz.png"))
+```
+
